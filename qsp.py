@@ -272,6 +272,7 @@ def adjustable_depth_controlled(n,m,f,ancilla_qA):
     return qc
 
 def adjustable_depth_diagonal_controlled(n,m,p,f):
+    '''
     # m = 0,...,n-p-1
     while m > n-p-1:
         m -= 1
@@ -279,8 +280,8 @@ def adjustable_depth_diagonal_controlled(n,m,p,f):
     if p > n-1:
         print('Wrong value for p')
         return 0
-    print('Adjustable-depth(n='+str(n)+',m='+str(m)+',p='+str(p)+')')
-    
+    print('Adjustable-depth controlled(n='+str(n)+',m='+str(m)+',p='+str(p)+')')
+    '''
     # The largest number of operation to parallelize is:
     # 2**m 2x2 gates in Q0 or n-p-1 for the bit flips of Q11
     M = 2**m
@@ -295,15 +296,74 @@ def adjustable_depth_diagonal_controlled(n,m,p,f):
     adj = adjustable_depth_controlled(n-p,m,f,ancilla_qA)
     all_qubits = [q[0]] + [q[i] for i in range(1,n-p)] + [i for i in qA] + [i for i in s] + [i for i in b]
     
-    log_ancilla = math.ceil(np.log2(ancilla_qA))
-    for i in range(log_ancilla):
-        for j in range(2**i):
-            qc.cnot(qA[j], qA[j+2**i])
-            
+    copy_gate = copy_trick(ancilla_qA).to_gate()
+    
+    qc.append(copy_gate, [i for i in qA])
+    
     qc = qc.compose(adj, all_qubits)
     
-    for i in range(log_ancilla):
-        for j in range(2**(log_ancilla-i-1)):
-            qc.cnot(qA[2**(log_ancilla-i-1)-j-1], qA[2**(log_ancilla-i-1)-j-1+2**(log_ancilla-i-1)])
+    qc.append(copy_gate.inverse(), [i for i in qA])
     
     return qc
+
+def adjustable_depth_qsp(n,m,p,eps0,f):
+    
+    def g(x):
+        return(-f(x)*eps0)
+    
+    # m = 0,...,n-p-1
+    while m > n-p-1:
+        m -= 1
+    # p = 0,...,n-1
+    if p > n-1:
+        print('Wrong value for p')
+        return 0
+    print('Adjustable-depth QSP(n='+str(n)+',m='+str(m)+',p='+str(p)+')')
+    
+    M = 2**m
+    ancilla_qA = max(M, n-p-1)
+    q = QuantumRegister(n, name= 'q')
+    qA = AncillaRegister(ancilla_qA, name= 'qA')
+    s = AncillaRegister(M-1, name= 's')
+    b = AncillaRegister(M, name= 'b')
+    qc = QuantumCircuit(q, qA, s, b)
+    all_qubits = [q[i] for i in range(n)] + [i for i in qA] + [i for i in s] + [i for i in b]
+    qc.h(q)
+    qc.h(qA[0])
+    
+    diag = adjustable_depth_diagonal_controlled(n,m,p,g)
+    
+    qc = qc.compose(diag, all_qubits)
+    
+    qc.h(qA[0])
+    qc.p(-np.pi/2, qA[0])
+    
+    qc.x(qA[0])
+    
+    return qc
+
+def copy_trick(n):
+    q = QuantumRegister(n)
+    qc = QuantumCircuit(q)
+    for i in range(n-1):
+        if np.log2(i+1).is_integer():
+            current_power = i+1
+            control_index = 0
+        qc.cnot(q[control_index], q[control_index+current_power])
+        control_index += 1
+    return qc
+
+def reordering(l,n,p):
+    reordered_list = []
+    r = 2**(n-p)
+    for i in range(r):
+        for j in range(2**p):
+            reordered_list.append(l[i+j*r])
+    return reordered_list
+
+def norm(f,N):
+    a=0
+    K=np.array(range(N),dtype=complex)/N
+    for i in range(N):
+        a+=f(K[i])*np.conjugate(f(K[i]))
+    return(np.real(np.sqrt(a))) 

@@ -241,3 +241,56 @@ def adjustable_depth(n,m,f):
     for i in range(2**(n-m-1)):
         qc = qc.compose(build_u_i(n,m,i,f),all_qubits)
     return qc
+
+def adjustable_depth_diagonal(n,m,p,f):
+    # m = 0,...,n-p-1
+    while m > n-p-1:
+        m -= 1
+    # p = 0,...,n-1
+    if p > n-1:
+        print('Wrong value for p')
+        return 0
+    print('Adjustable-depth(n='+str(n)+',m='+str(m)+',p='+str(p)+')')
+    M = 2**m
+    q = QuantumRegister(n, name= 'q')
+    s = AncillaRegister(M-1, name= 's')
+    b = AncillaRegister(M, name= 'b')
+    qc = QuantumCircuit(q, s, b)
+    
+    qc.h(q)
+    adj = adjustable_depth(n-p,m,f)
+    all_qubits = [q[0]] + [q[i] for i in range(1,n-p)] + [i for i in s] + [i for i in b]
+    
+    qc = qc.compose(adj, all_qubits)
+    
+    return qc
+
+def reordering(l,n,p):
+    reordered_list = []
+    r = 2**(n-p)
+    for i in range(r):
+        for j in range(2**p):
+            reordered_list.append(l[i+j*r])
+    return reordered_list
+
+### Matrix representation ###
+def diagonal_unitary(n,f):
+    diag_unitary = np.identity(2**n,dtype=np.complex128)
+    for i in range(2**n):
+        x = bin(i)[2:].zfill(n)[::-1]
+        dyadic = 0
+        for j in range(n):
+            dyadic += int(x[n-j-1])/2**(j+1)
+        diag_unitary[i][i] = np.exp(1j*f(dyadic))
+    return diag_unitary
+
+def hadamard_state(n):
+    state = np.ones(2**n,dtype=np.complex128)
+    state /= np.linalg.norm(state)
+    return state
+
+def fidelity(psi1,psi2,n):
+    F = 0+0j
+    for i in range(2**n):
+        F += np.conj(psi1[i])*psi2[i]
+    return(abs(F)**2)
