@@ -1,1 +1,1 @@
-# Adjustable-depth-quantum-circuit-for-diagonal-unitary-and-QSP
+# Adjustable-depth quantum circuits for unitary and non-unitary diagonal operators
