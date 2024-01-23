@@ -1,9 +1,6 @@
 import numpy as np
 from qiskit import QuantumCircuit, QuantumRegister, AncillaRegister
 from qiskit.circuit.library import RZGate, PhaseGate, MCPhaseGate
-from qiskit.tools.visualization import *
-import qiskit.quantum_info as qi
-import matplotlib.pyplot as plt
 from primitives import *
 
 def walsh(j,x): 
