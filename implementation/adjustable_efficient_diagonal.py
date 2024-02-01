@@ -43,7 +43,6 @@ def diagonal(n,f,n_ancilla,list_operator_to_implement,decomposition='walsh',gray
 
     if decomposition == 'walsh':
         walsh_info = walsh_informations(n,list_operator_to_implement,f,gray_code=gray_code)
-        print(walsh_info)
         for i in range(0,n_blocks):
             walsh_info_block = dict(list(walsh_info.items())[:n_operator_per_block_list[i]])
             qc.append(walsh_circuit(n,f,walsh_info_block,gray_code=gray_code),qc.qubits[i*n:(i+1)*n])

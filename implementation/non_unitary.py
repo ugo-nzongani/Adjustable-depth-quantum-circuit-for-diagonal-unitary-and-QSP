@@ -129,14 +129,18 @@ def walsh_circuit_non_unitary(n,n_ancilla_qsp,f,walsh_info,gray_code=True):
                 qc.append(operator,q_qubits+[a_qsp_qubits[qsp_control_index]])
                 qc.x(a_qsp_qubits[qsp_control_index])
             elif index > 0:
-                previous_cnots_index = other_one_bits(int_to_binary(order_list[index-1],n,reverse=False))
-                current_cnots_index = other_one_bits(int_to_binary(order_list[index],n,reverse=False))
-                if len(previous_cnots_index) > len(current_cnots_index):
-                    cnots_index = list(set(previous_cnots_index)-set(current_cnots_index))
-                else:
-                    cnots_index = list(set(current_cnots_index)-set(previous_cnots_index))
+                previous_control_index = other_one_bits(int_to_binary(order_list[index-1],n,reverse=False))
+                current_control_index = other_one_bits(int_to_binary(order_list[index],n,reverse=False))
+                previous_rotation_index = first_one_bit(int_to_binary(order_list[index-1],n,reverse=False))
+                previous_cnots = []
+                current_cnots = []
+                for i in previous_control_index:
+                    previous_cnots.append((i,previous_rotation_index))
+                for i in current_control_index:
+                    current_cnots.append((i,rotation_index))
+                cnots_index = list((set(previous_cnots)|set(current_cnots)) - set.intersection(set(previous_cnots),set(current_cnots)))
                 for j in cnots_index:
-                    qc.cx(q[j],q[rotation_index])
+                    qc.cx(q[j[0]],q[j[1]])
                 qc.append(walsh_operators_dagger_list[index],q_qubits+[a_qsp_qubits[qsp_control_index]])
                 qc.x(a_qsp_qubits[qsp_control_index])
                 qc.append(operator,q_qubits+[a_qsp_qubits[qsp_control_index]])
