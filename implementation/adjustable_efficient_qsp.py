@@ -31,10 +31,10 @@ def qsp(n,f,n_ancilla_diag,n_ancilla_qsp,list_operator_to_implement,decompositio
     qA = QuantumRegister(1,name='qA')
     a = AncillaRegister(n_ancilla_diag,name='a')
     a_qsp = AncillaRegister(n_ancilla_qsp,name='a_qsp')
-    qc = QuantumCircuit(qA,q,a,a_qsp)
+    qc = QuantumCircuit(q,qA,a,a_qsp)
 
-    qA_qubits = qc.qubits[:1]
-    q_qubits = qc.qubits[1:n+1]
+    q_qubits = qc.qubits[:n]
+    qA_qubits = qc.qubits[n:n+1]
     a_qubits = qc.qubits[n+1:n+1+n_ancilla_diag]
     a_qsp_qubits = qc.qubits[n+1+n_ancilla_diag:n+1+n_ancilla_diag+n+1+n_ancilla_qsp]
 

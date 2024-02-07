@@ -44,7 +44,10 @@ def walsh_coeff_non_unitary(j,f,N,d):
     a = 0
     dmax = get_dmax(d,N)
     for i in range(N):
-        a += f(k[i],d,dmax) * walsh(j,k[i])/N
+        if callable(f):
+            a += f(k[i],d,dmax) * walsh(j,k[i])/N
+        else:
+            a += f[i] * walsh(j,k[i])/N
     return a
 
 def walsh_informations_non_unitary(n,list_operator_to_implement,f,d,gray_code=True):
@@ -175,8 +178,11 @@ def sequential_coeff_non_unitary(j,f,N,d):
     -------
     float
     """
-    dmax = get_dmax(d,N)
-    return f(j/N,d,dmax)
+    if callable(f):
+        dmax = get_dmax(d,N)
+        return f(j/N,d,dmax)
+    else:
+        return f[j]
 
 def sequential_informations_non_unitary(n,list_operator_to_implement,f,d,gray_code=True):
     """Returns a dictionnary whose keys are the order of sequential operators to implement and the

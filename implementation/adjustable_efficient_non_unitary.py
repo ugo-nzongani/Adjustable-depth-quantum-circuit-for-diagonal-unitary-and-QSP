@@ -1,7 +1,7 @@
 from qiskit import QuantumRegister, AncillaRegister, QuantumCircuit
 from non_unitary import *
 
-def non_unitary(n,d,n_ancilla_diag,n_ancilla_qsp,list_operator_to_implement,decomposition='walsh',gray_code=True,swaps=False):
+def non_unitary(n,f,d,n_ancilla_diag,n_ancilla_qsp,list_operator_to_implement,decomposition='walsh',gray_code=True,swaps=False):
     """Generates the quantum circuit implementing a non_unitary diagonal operator
     Parameters
     ----------
@@ -26,17 +26,14 @@ def non_unitary(n,d,n_ancilla_diag,n_ancilla_qsp,list_operator_to_implement,deco
     -------
     qiskit.circuit.quantumcircuit.QuantumCircuit
     """
-    def f(x,d,dmax):
-        return np.arccos(d(x)/(2*dmax))
-
     q = QuantumRegister(n,name='q')
     qA = QuantumRegister(1,name='qA')
     a = AncillaRegister(n_ancilla_diag,name='a')
     a_qsp = AncillaRegister(n_ancilla_qsp,name='a_qsp')
-    qc = QuantumCircuit(qA,q,a,a_qsp)
+    qc = QuantumCircuit(q,qA,a,a_qsp)
 
-    qA_qubits = qc.qubits[:1]
-    q_qubits = qc.qubits[1:n+1]
+    q_qubits = qc.qubits[:n]
+    qA_qubits = qc.qubits[n:n+1]
     a_qubits = qc.qubits[n+1:n+1+n_ancilla_diag]
     a_qsp_qubits = qc.qubits[n+1+n_ancilla_diag:n+1+n_ancilla_diag+n+1+n_ancilla_qsp]
 
