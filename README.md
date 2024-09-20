@@ -10,8 +10,7 @@ Unitary and non-unitary diagonal operators are fundamental building blocks in qu
 
 ### Versions:
 qiskit: 0.24.1 <br> 
-qiskit-terra: 0.24.1 <br> 
-qiskit-ignis: 0.5.2 <br> 
+qiskit-terra: 0.24.1
 
 ### Descriptions:
 
