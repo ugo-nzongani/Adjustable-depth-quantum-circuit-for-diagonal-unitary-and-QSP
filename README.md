@@ -1,7 +1,8 @@
 ## Qiskit implementation of https://arxiv.org/abs/2404.02819
 
 ## Efficient Quantum Circuits for Non-Unitary and Unitary Diagonal Operators with Space-Time-Accuracy trade-offs
-### Authors: Julien Zylberman, Ugo Nzongani, Andrea Simonetto, Fabrice Debbasch
+### Authors: 
+Julien Zylberman, Ugo Nzongani, Andrea Simonetto, Fabrice Debbasch
 
 ### Abstract:
 
