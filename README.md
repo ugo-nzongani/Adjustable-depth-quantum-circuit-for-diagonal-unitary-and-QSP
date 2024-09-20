@@ -12,7 +12,7 @@ Unitary and non-unitary diagonal operators are fundamental building blocks in qu
 qiskit: 0.24.1 <br> 
 qiskit-terra: 0.24.1
 
-### Descriptions:
+### Description:
 
 The files with the python extension '.py' contain the code to generate the quantum circuits.
 
