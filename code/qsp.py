@@ -1,8 +1,8 @@
 from qiskit import QuantumRegister, AncillaRegister, QuantumCircuit
 from qiskit.circuit.library import MCXGate, CRZGate, CPhaseGate
-from walsh import *
-from sequential import *
-from primitives import *
+from code.walsh import *
+from code.sequential import *
+from code.primitives import *
 
 ### WALSH ###
 

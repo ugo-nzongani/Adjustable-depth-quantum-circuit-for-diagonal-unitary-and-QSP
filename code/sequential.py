@@ -1,7 +1,7 @@
 import numpy as np
 from qiskit import QuantumCircuit, QuantumRegister, AncillaRegister
 from qiskit.circuit.library import RZGate, PhaseGate, MCPhaseGate
-from primitives import *
+from code.primitives import *
 
 def sequential_coeff(j,f,N):
     """j-th coefficient of the N-th sequential decomposition of f

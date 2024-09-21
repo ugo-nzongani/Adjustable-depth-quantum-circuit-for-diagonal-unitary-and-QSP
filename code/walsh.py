@@ -1,7 +1,7 @@
 import numpy as np
 from qiskit import QuantumCircuit, QuantumRegister, AncillaRegister
 from qiskit.circuit.library import RZGate, PhaseGate, MCPhaseGate
-from primitives import *
+from code.primitives import *
 
 def walsh(j,x): 
     """The value of j-th Walsh function at position x

@@ -1,5 +1,5 @@
 from qiskit import QuantumRegister, AncillaRegister, QuantumCircuit
-from non_unitary import *
+from code.non_unitary import *
 
 def non_unitary(n,f,d,n_ancilla_diag,n_ancilla_qsp,list_operator_to_implement,decomposition='walsh',gray_code=True,swaps=False):
     """Generates the quantum circuit implementing a non_unitary diagonal operator

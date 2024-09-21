@@ -1,5 +1,5 @@
-from walsh import *
-from sequential import *
+from code.walsh import *
+from code.sequential import *
 
 def diagonal(n,f,n_ancilla,list_operator_to_implement,decomposition='walsh',gray_code=True,swaps=False):
     """Generates the quantum circuit implementing the sequential decomposition of function f with the sequential operators
