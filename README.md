@@ -14,6 +14,6 @@ qiskit-terra: 0.24.1
 
 ### Description:
 
-The files with the python extension '.py' contain the code to generate the quantum circuits.
+The python files in the "code" folder contain all the code needed to generate the quantum circuits.
 
 The notebooks with the extension '.ipynb' show some examples of how to use the code.
