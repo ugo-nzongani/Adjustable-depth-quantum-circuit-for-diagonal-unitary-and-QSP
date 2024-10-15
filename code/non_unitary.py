@@ -1,8 +1,8 @@
 from qiskit import QuantumRegister, AncillaRegister, QuantumCircuit
 from qiskit.circuit.library import MCXGate, QFT, CPhaseGate, CRZGate
-from walsh import *
-from sequential import *
-from qsp import *
+from code.walsh import *
+from code.sequential import *
+from code.qsp import *
 import torch
 from hadamard_transform import hadamard_transform
 
