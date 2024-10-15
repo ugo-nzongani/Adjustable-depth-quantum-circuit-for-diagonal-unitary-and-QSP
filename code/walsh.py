@@ -1,7 +1,7 @@
 import numpy as np
 from qiskit import QuantumCircuit, QuantumRegister, AncillaRegister
 from qiskit.circuit.library import RZGate, PhaseGate, MCPhaseGate
-from primitives import *
+from code.primitives import *
 import torch
 from hadamard_transform import hadamard_transform
 
