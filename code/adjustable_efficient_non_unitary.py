@@ -1,7 +1,7 @@
 from qiskit import QuantumRegister, AncillaRegister, QuantumCircuit
-from code.non_unitary import *
+from non_unitary import *
 
-def non_unitary(n,f,d,n_ancilla_diag,n_ancilla_qsp,list_operator_to_implement,decomposition='walsh',gray_code=True,swaps=False):
+def non_unitary(n,f,d,n_ancilla_diag,n_ancilla_qsp,n_operators,decomposition='walsh',gray_code=True,swaps=False):
     """Generates the quantum circuit implementing a non_unitary diagonal operator
     Parameters
     ----------
@@ -13,9 +13,9 @@ def non_unitary(n,f,d,n_ancilla_diag,n_ancilla_qsp,list_operator_to_implement,de
         Number of ancilla qubits available for the parallelization of the diagonal operator
     n_ancilla_qsp : int
         Number of ancilla qubits available for the parallelization of the controlled operation
-    list_operator_to_implement : int list
-        List containing the indices of the operators to implement, an exact implementation requires to
-        implement all of them
+    n_operators : int
+        Number of operators to implement, an exact implementation requires to
+        implement all of them, i.e. 2^n
     decomposition : str
         'walsh' or 'sequential', it indicates the type of the decomposition for the circuit
     gray_code : bool
@@ -55,13 +55,13 @@ def non_unitary(n,f,d,n_ancilla_diag,n_ancilla_qsp,list_operator_to_implement,de
         qc.append(copy_gate,q_qubits+a_qubits)
     
     n_blocks = get_n_blocks(n,n_ancilla_diag)
-    n_rotations = len(list_operator_to_implement)
+    n_rotations = n_operators
     n_operator_per_block_list = n_operator_per_block(n_rotations,n_blocks)
     n_ancilla_qsp_block = (n_ancilla_qsp+1)//n_blocks
     if decomposition == 'walsh':
         qsp_control_index = 0
         n_op = 2**n #len(list_operator_to_implement)
-        walsh_info = walsh_informations_non_unitary(n,n_op,list_operator_to_implement,f,d,gray_code=gray_code)
+        walsh_info = walsh_informations_non_unitary(n,n_operators,f,d,gray_code=gray_code)
         #print(walsh_info)
         for i in range(0,n_blocks):
             walsh_info_block = dict(list(walsh_info.items())[:n_operator_per_block_list[i]])
@@ -69,7 +69,7 @@ def non_unitary(n,f,d,n_ancilla_diag,n_ancilla_qsp,list_operator_to_implement,de
             walsh_info = dict(list(walsh_info.items())[n_operator_per_block_list[i]:])
             qsp_control_index = (qsp_control_index+n_ancilla_qsp_block)%(n_ancilla_qsp+1)
     elif decomposition == 'sequential':
-        sequential_info = sequential_informations_non_unitary(n,list_operator_to_implement,f,d,gray_code=gray_code)
+        sequential_info = sequential_informations_non_unitary(n,n_operators,f,d,gray_code=gray_code)
         #print(sequential_info)
         for i in range(0,n_blocks):
             sequential_info_block = dict(list(sequential_info.items())[:n_operator_per_block_list[i]])

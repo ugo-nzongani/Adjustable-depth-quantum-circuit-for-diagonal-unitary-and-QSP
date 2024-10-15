@@ -1,7 +1,22 @@
 import numpy as np
 from qiskit import QuantumCircuit, QuantumRegister, AncillaRegister
 from qiskit.circuit.library import RZGate, PhaseGate, MCPhaseGate
-from code.primitives import *
+from primitives import *
+import torch
+from hadamard_transform import hadamard_transform
+
+def reordering(j,n):
+    L = dyatic(j/2**n, n)
+    jnew = 0
+    for i in range(n):
+        jnew += L[i]*2**(i)
+    return(int(jnew))
+
+def fast_list_walsh_coeff(f,n):
+    Values = [f(x/2**n) for x in range(2**n)]    
+    L_walsh_coeff_f = np.array(hadamard_transform(torch.Tensor(Values)))/np.sqrt(2**n)
+    L_walsh_coeff = [L_walsh_coeff_f[reordering(j,n)] for j in range(2**n)]
+    return(L_walsh_coeff)
 
 def walsh(j,x): 
     """The value of j-th Walsh function at position x
@@ -80,15 +95,15 @@ def walsh_operator(n,order,walsh_coeff,cnots=True):
                 qc.cx(q[i],q[rotation_index])          
     return qc
 
-def walsh_informations(n,list_operator_to_implement,f,gray_code=True):
+def walsh_informations(n,n_operators,f,gray_code=True):
     """Returns a dictionnary whose keys are the order of Walsh operators to implement and the
     values are the associated coefficients
     Parameters
     ----------
     n : int
         Number of qubit encoding the position
-    list_operator_to_implement : int list
-        List of orders of the Walsh operators to implement
+    n_operators : int
+        Number of Walsh operators to implement
     f : function
         Function of one variable
     gray_code : bool
@@ -98,15 +113,17 @@ def walsh_informations(n,list_operator_to_implement,f,gray_code=True):
     dict
     """
     walsh_dict = {}
-    n_operator_to_implement = len(list_operator_to_implement)
+    # Computation of the Walsh coefficient
+    walsh_coeff_list = np.array(fast_list_walsh_coeff(f,n))
+    list_operator_to_implement = np.argsort(abs(walsh_coeff_list))[::-1][:n_operators]
     if gray_code:
         gray_list = generate_gray_code(n)
         for i in gray_list:
             if i in list_operator_to_implement:
-                walsh_dict[i] = walsh_coeff(i,f,2**n)
+                walsh_dict[i] = walsh_coeff_list[i] # walsh_coeff(i,f,2**n)
     else:          
-        for i in range(n_operator_to_implement):
-            walsh_dict[list_operator_to_implement[i]] = walsh_coeff(list_operator_to_implement[i],f,2**n)
+        for i in range(n_operators):
+            walsh_dict[list_operator_to_implement[i]] = walsh_coeff_list[list_operator_to_implement[i]] # walsh_coeff(list_operator_to_implement[i],f,2**n)
     return walsh_dict
 
 def walsh_circuit(n,f,walsh_info,gray_code=True):

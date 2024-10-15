@@ -1,7 +1,7 @@
 import numpy as np
 from qiskit import QuantumCircuit, QuantumRegister, AncillaRegister
 from qiskit.circuit.library import RZGate, PhaseGate, MCPhaseGate
-from code.primitives import *
+from primitives import *
 
 def sequential_coeff(j,f,N):
     """j-th coefficient of the N-th sequential decomposition of f
@@ -60,15 +60,15 @@ def sequential_operator(n,order,theta,nots=True):
                 qc.x(q[n-i-1])
     return qc
 
-def sequential_informations(n,list_operator_to_implement,f,gray_code=True):
+def sequential_informations(n,n_operators,f,gray_code=True):
     """Returns a dictionnary whose keys are the order of sequential operators to implement and the
     values are the associated coefficients
     Parameters
     ----------
     n : int
         Number of qubit encoding the position
-    list_operator_to_implement : int list
-        List of orders of the Walsh operators to implement
+    n_operators : int
+        Number of Walsh operators to implement
     f : function
         Function of one variable
     gray_code : bool
@@ -78,14 +78,15 @@ def sequential_informations(n,list_operator_to_implement,f,gray_code=True):
     dict
     """
     sequential_dict = {}
-    n_operator_to_implement = len(list_operator_to_implement)
+    sequential_coeff_list = np.array([sequential_coeff(i,f,2**n) for i in range(2**n)])
+    list_operator_to_implement = np.argsort(abs(sequential_coeff_list))[::-1][:n_operators]
     if gray_code:
         gray_list = generate_gray_code(n)
         for i in gray_list:
             if i in list_operator_to_implement:
                 sequential_dict[i] = sequential_coeff(i,f,2**n)
     else:
-        for i in range(n_operator_to_implement): 
+        for i in range(n_operators): 
             sequential_dict[list_operator_to_implement[i]] = sequential_coeff(list_operator_to_implement[i],f,2**n)
     return sequential_dict
 

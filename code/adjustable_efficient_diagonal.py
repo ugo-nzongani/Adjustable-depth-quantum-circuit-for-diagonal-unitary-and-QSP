@@ -1,7 +1,7 @@
-from code.walsh import *
-from code.sequential import *
+from walsh import *
+from sequential import *
 
-def diagonal(n,f,n_ancilla,list_operator_to_implement,decomposition='walsh',gray_code=True,swaps=False):
+def diagonal(n,f,n_ancilla,n_operators,decomposition='walsh',gray_code=True,swaps=False):
     """Generates the quantum circuit implementing the sequential decomposition of function f with the sequential operators
         whose order are contain in sequential_info 
     Parameters
@@ -12,9 +12,9 @@ def diagonal(n,f,n_ancilla,list_operator_to_implement,decomposition='walsh',gray
         Function of one variable
     n_ancilla : int
         Number of ancilla qubits available
-    list_operator_to_implement : int list
-        List containing the indices of the operators to implement, an exact implementation requires to
-        implement all of them
+    n_operators : int
+        Number of operators to implement, an exact implementation requires to
+        implement all of them, i.e. 2^n
     decomposition : str
         'walsh' or 'sequential', it indicates the type of the decomposition for the circuit
     gray_code : bool
@@ -38,18 +38,18 @@ def diagonal(n,f,n_ancilla,list_operator_to_implement,decomposition='walsh',gray
         qc.append(copy_gate,qc.qubits)
 
     n_blocks = get_n_blocks(n,n_ancilla)
-    n_rotations = len(list_operator_to_implement)
+    n_rotations = n_operators
     n_operator_per_block_list = n_operator_per_block(n_rotations,n_blocks)
 
     if decomposition == 'walsh':
-        walsh_info = walsh_informations(n,list_operator_to_implement,f,gray_code=gray_code)
+        walsh_info = walsh_informations(n,n_operators,f,gray_code=gray_code)
         for i in range(0,n_blocks):
             walsh_info_block = dict(list(walsh_info.items())[:n_operator_per_block_list[i]])
             qc.append(walsh_circuit(n,f,walsh_info_block,gray_code=gray_code),qc.qubits[i*n:(i+1)*n])
             walsh_info = dict(list(walsh_info.items())[n_operator_per_block_list[i]:])
 
     elif decomposition == 'sequential':
-        sequential_info = sequential_informations(n,list_operator_to_implement,f,gray_code=gray_code)
+        sequential_info = sequential_informations(n,n_operators,f,gray_code=gray_code)
         for i in range(0,n_blocks):
             sequential_info_block = dict(list(sequential_info.items())[:n_operator_per_block_list[i]])
             qc.append(sequential_circuit(n,f,sequential_info_block,gray_code=gray_code),qc.qubits[i*n:(i+1)*n])

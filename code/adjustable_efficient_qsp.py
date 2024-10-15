@@ -1,5 +1,5 @@
 from qiskit import QuantumRegister, AncillaRegister, QuantumCircuit
-from code.qsp import *
+from qsp import *
 
 def qsp(n,f,n_ancilla_diag,n_ancilla_qsp,list_operator_to_implement,decomposition='walsh',gray_code=True,swaps=False):
     """Generates the quantum circuit implementing the sequential decomposition of function f with the sequential operators

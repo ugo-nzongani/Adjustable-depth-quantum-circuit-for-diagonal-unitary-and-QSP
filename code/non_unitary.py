@@ -1,9 +1,24 @@
 from qiskit import QuantumRegister, AncillaRegister, QuantumCircuit
 from qiskit.circuit.library import MCXGate, QFT, CPhaseGate, CRZGate
-from code.walsh import *
-from code.sequential import *
-from code.qsp import *
+from walsh import *
+from sequential import *
+from qsp import *
+import torch
+from hadamard_transform import hadamard_transform
 
+def reordering(j,n):
+    L = dyatic(j/2**n, n)
+    jnew = 0
+    for i in range(n):
+        jnew += L[i]*2**(i)
+    return(int(jnew))
+
+def fast_list_walsh_coeff(f,n):
+    Values = [f(x/2**n) for x in range(2**n)]    
+    L_walsh_coeff_f = np.array(hadamard_transform(torch.Tensor(Values)))/np.sqrt(2**n)
+    L_walsh_coeff = [L_walsh_coeff_f[reordering(j,n)] for j in range(2**n)]
+    return(L_walsh_coeff)
+    
 def get_dmax(d,N):
     """Returns the maximal absolute value of function d
     Parameters
@@ -40,7 +55,6 @@ def walsh_coeff_non_unitary(j,f,N,d):
     -------
     float
     """
-    #print('op',N)
     k = np.array(range(N))/N
     a = 0
     dmax = get_dmax(d,N)
@@ -51,15 +65,15 @@ def walsh_coeff_non_unitary(j,f,N,d):
             a += f[i] * walsh(j,k[i])/N
     return a
 
-def walsh_informations_non_unitary(n,n_op,list_operator_to_implement,f,d,gray_code=True):
+def walsh_informations_non_unitary(n,n_operators,f,d,gray_code=True):
     """Returns a dictionnary whose keys are the order of Walsh operators to implement and the
     values are the associated coefficients
     Parameters
     ----------
     n : int
         Number of qubit encoding the position
-    list_operator_to_implement : int list
-        List of orders of the Walsh operators to implement
+    n_operators : int
+        Number of Walsh operators to implement
     f : function
         Function of one variable
     gray_code : bool
@@ -71,15 +85,23 @@ def walsh_informations_non_unitary(n,n_op,list_operator_to_implement,f,d,gray_co
     dict
     """
     walsh_dict = {}
-    n_operator_to_implement = len(list_operator_to_implement)
+    
+    # Computation of the Walsh coefficient
+    
+    dmax = get_dmax(d,2**n)
+    def g(x):
+        return f(x,d,dmax)
+        
+    walsh_coeff_list = np.array(fast_list_walsh_coeff(g,n))
+    list_operator_to_implement = np.argsort(abs(walsh_coeff_list))[::-1][:n_operators]
     if gray_code:
         gray_list = generate_gray_code(n)
         for i in gray_list:
             if i in list_operator_to_implement:
-                walsh_dict[i] = walsh_coeff_non_unitary(i,f,n_op,d)
-    else:          
-        for i in range(n_operator_to_implement):
-            walsh_dict[list_operator_to_implement[i]] = walsh_coeff_non_unitary(list_operator_to_implement[i],f,n_op,d)
+                walsh_dict[i] = walsh_coeff_list[i] # walsh_coeff_non_unitary(i,f,2**n,d)
+    else:         
+        for i in range(n_operators):
+            walsh_dict[list_operator_to_implement[i]] = walsh_coeff_list[list_operator_to_implement[i]] # walsh_coeff_non_unitary(list_operator_to_implement[i],f,2**n,d)
     return walsh_dict
 
 def walsh_circuit_non_unitary(n,n_ancilla_qsp,f,walsh_info,qsp_control_index,n_ancilla_qsp_block,gray_code=True):
