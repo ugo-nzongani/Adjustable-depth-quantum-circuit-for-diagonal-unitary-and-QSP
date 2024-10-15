@@ -16,6 +16,6 @@ qiskit-terra: 0.24.1
 
 The python files in the "code" folder contain all the code needed to generate the quantum circuits.
 
-The notebook diagonal_unitary_example presents the implementation of a diagonal unitary using a Walsh series approximation.
+The notebook diagonal_unitary_example presents ajustable-depth quantum circuits for the implementation of a diagonal unitary using a Walsh series approximation.
 
-The notebook diagonal_non_unitary_and_quantum_state_preparation_example presents the block-encoding of a non-unitary diagonal operator and its application to Quantum State Preparation.
+The notebook diagonal_non_unitary_and_quantum_state_preparation_example presents ajustable-depth quantum circuits for the block-encoding of a non-unitary diagonal operator and its application to Quantum State Preparation.
